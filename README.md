@@ -5,9 +5,6 @@
 ---
 
 ##  GIAO DIỆN & TRẢI NGHIỆM NGƯỜI DÙNG (HIGHLIGHTS)
-
-Dưới đây là những hình ảnh thực tế về giao diện và trải nghiệm mua sắm trên hệ thống.
-
 ###  1. Trang chủ & Sản phẩm (Home & Products)
 Giao diện được thiết kế hiện đại, tập trung vào hình ảnh sản phẩm thể thao năng động.
 
