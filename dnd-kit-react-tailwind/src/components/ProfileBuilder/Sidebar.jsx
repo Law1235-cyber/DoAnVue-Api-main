@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DraggableSource } from './DraggableSource';
-import { SIDEBAR_ITEMS } from './constants';
+import { SIDEBAR_CATEGORIES } from './constants';
 import ComponentThumbnail from './ComponentThumbnail';
 import HeroProduct from './HeroProduct';
 import TrustBadge from './TrustBadge';
@@ -8,6 +8,7 @@ import CollectionsGrid from './CollectionsGrid';
 import SellerVideo from './SellerVideo';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 // Registry for sidebar thumbnails
 const THUMBNAIL_MAP = {
@@ -18,6 +19,19 @@ const THUMBNAIL_MAP = {
 };
 
 export default function Sidebar({ isOpen, onClose }) {
+  // State to track expanded categories. Default all open.
+  const [expandedCategories, setExpandedCategories] = useState(
+    SIDEBAR_CATEGORIES.map(c => c.id)
+  );
+
+  const toggleCategory = (id) => {
+    setExpandedCategories(prev =>
+      prev.includes(id)
+        ? prev.filter(c => c !== id)
+        : [...prev, id]
+    );
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -41,19 +55,39 @@ export default function Sidebar({ isOpen, onClose }) {
             <p className="text-xs text-gray-500">Drag to build your page.</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 pb-6">
-            <div className="flex flex-col gap-4">
-                {SIDEBAR_ITEMS.map((item) => {
-                    const Component = THUMBNAIL_MAP[item.type];
+        <div className="flex-1 overflow-y-auto px-4 pb-6">
+            <div className="flex flex-col gap-2">
+                {SIDEBAR_CATEGORIES.map((category) => {
+                    const isExpanded = expandedCategories.includes(category.id);
+
                     return (
-                    <DraggableSource
-                        key={item.type}
-                        id={item.type}
-                        type={item.type}
-                        label={item.label}
-                    >
-                        {Component && <ComponentThumbnail component={Component} scale={0.32} />}
-                    </DraggableSource>
+                        <div key={category.id} className="border-b border-gray-100 last:border-0 pb-2">
+                            <button
+                                onClick={() => toggleCategory(category.id)}
+                                className="w-full flex items-center justify-between p-2 text-left text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                                <span>{category.label}</span>
+                                {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                            </button>
+
+                            {isExpanded && (
+                                <div className="flex flex-col gap-4 mt-2 px-2 animate-in slide-in-from-top-2 duration-200">
+                                    {category.items.map((item) => {
+                                        const Component = THUMBNAIL_MAP[item.type];
+                                        return (
+                                        <DraggableSource
+                                            key={item.type}
+                                            id={item.type}
+                                            type={item.type}
+                                            label={item.label}
+                                        >
+                                            {Component && <ComponentThumbnail component={Component} scale={0.32} />}
+                                        </DraggableSource>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
                     );
                 })}
             </div>
