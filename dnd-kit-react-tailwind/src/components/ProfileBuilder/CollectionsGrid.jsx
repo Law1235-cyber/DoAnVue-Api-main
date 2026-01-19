@@ -1,17 +1,22 @@
 import React from 'react';
 
-export default function CollectionsGrid() {
+import { COMPONENT_SCHEMAS } from './schemas';
+
+export default function CollectionsGrid({ content }) {
+  const defaults = COMPONENT_SCHEMAS.collectionsGrid.fields.reduce((acc, f) => ({...acc, [f.name]: f.default}), {});
+  const data = { ...defaults, ...content };
+
   const collections = [
-    { name: 'New Arrivals', count: 42, color: 'bg-rose-50' },
-    { name: 'Best Sellers', count: 18, color: 'bg-amber-50' },
-    { name: 'Accessories', count: 56, color: 'bg-emerald-50' },
-    { name: 'Sale', count: 24, color: 'bg-indigo-50' },
+    { name: data.col1Name, count: data.col1Count, color: 'bg-rose-50' },
+    { name: data.col2Name, count: data.col2Count, color: 'bg-amber-50' },
+    { name: data.col3Name, count: data.col3Count, color: 'bg-emerald-50' },
+    { name: data.col4Name, count: data.col4Count, color: 'bg-indigo-50' },
   ];
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <div className="flex justify-between items-end mb-6">
-         <h3 className="text-xl font-bold text-gray-900">Featured Collections</h3>
+         <h3 className="text-xl font-bold text-gray-900">{data.title}</h3>
          <a href="#" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">View All</a>
       </div>
 
@@ -23,7 +28,7 @@ export default function CollectionsGrid() {
                     <span className="text-gray-400 font-medium text-sm">Img</span>
                 </div>
                 <h4 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{col.name}</h4>
-                <p className="text-xs text-gray-500">{col.count} items</p>
+                <p className="text-xs text-gray-500">{col.count}</p>
             </div>
         ))}
       </div>

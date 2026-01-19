@@ -5,7 +5,7 @@ import { SortableItem } from './SortableItem';
 import { Plus } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-export default function Canvas({ items, renderComponent, onDelete, viewMode }) {
+export default function Canvas({ items, renderComponent, onDelete, viewMode, onSelect, selectedItemId }) {
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas-droppable',
   });
@@ -34,6 +34,7 @@ export default function Canvas({ items, renderComponent, onDelete, viewMode }) {
 
       <div className={`w-full ${getMaxWidth()} transition-all duration-500 ease-in-out`}>
         <div
+          id="canvas-droppable" // Add explicit ID for Playwright
           ref={setNodeRef}
           className={`
             min-h-[600px] rounded-xl transition-all duration-300 relative
@@ -63,6 +64,8 @@ export default function Canvas({ items, renderComponent, onDelete, viewMode }) {
                         id={item.id}
                         component={renderComponent(item)}
                         onDelete={onDelete}
+                        onSelect={onSelect}
+                        isSelected={selectedItemId === item.id}
                     />
                 ))}
                 </SortableContext>
@@ -87,4 +90,6 @@ Canvas.propTypes = {
   renderComponent: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   viewMode: PropTypes.oneOf(['desktop', 'tablet', 'mobile']),
+  onSelect: PropTypes.func,
+  selectedItemId: PropTypes.string
 };

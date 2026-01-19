@@ -1,7 +1,12 @@
 import React from 'react';
 import { ShoppingBag } from 'lucide-react';
 
-export default function HeroProduct() {
+import { COMPONENT_SCHEMAS } from './schemas';
+
+export default function HeroProduct({ content }) {
+  const defaults = COMPONENT_SCHEMAS.heroProduct.fields.reduce((acc, f) => ({...acc, [f.name]: f.default}), {});
+  const data = { ...defaults, ...content };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-shadow">
       <div className="flex flex-col md:flex-row h-auto md:h-96">
@@ -10,17 +15,17 @@ export default function HeroProduct() {
             <span className="text-gray-400 font-medium text-lg relative z-10">Product Image Area</span>
         </div>
         <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-center">
-            <div className="uppercase tracking-wide text-xs md:text-sm text-indigo-500 font-bold mb-2">Best Seller</div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight">Premium Leather Backpack</h2>
+            <div className="uppercase tracking-wide text-xs md:text-sm text-indigo-500 font-bold mb-2">{data.subtitle}</div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight">{data.title}</h2>
             <p className="text-gray-600 mb-6 text-sm md:text-base leading-relaxed">
-                Handcrafted from full-grain leather, this backpack is built to last a lifetime. Features a padded laptop sleeve and multiple organizer pockets.
+                {data.description}
             </p>
             <div className="flex items-center gap-4 mb-6 md:mb-8">
-                <span className="text-2xl font-bold text-gray-900">$129.00</span>
-                <span className="text-lg text-gray-400 line-through">$189.00</span>
+                <span className="text-2xl font-bold text-gray-900">{data.price}</span>
+                <span className="text-lg text-gray-400 line-through">{data.originalPrice}</span>
             </div>
             <button className="bg-gray-900 text-white px-6 md:px-8 py-3 rounded-lg font-medium hover:bg-black transition-all transform active:scale-95 w-full md:w-fit flex items-center justify-center gap-2 shadow-lg shadow-gray-200">
-                <ShoppingBag size={20} /> Buy Now
+                <ShoppingBag size={20} /> {data.buttonText}
             </button>
         </div>
       </div>

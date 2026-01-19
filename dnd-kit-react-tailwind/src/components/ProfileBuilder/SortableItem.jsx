@@ -4,7 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-export function SortableItem({ id, component, onDelete }) {
+export function SortableItem({ id, component, onDelete, onSelect, isSelected }) {
   const {
     attributes,
     listeners,
@@ -24,13 +24,23 @@ export function SortableItem({ id, component, onDelete }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="relative mb-6 group transition-all"
+      className={`relative mb-6 group transition-all ${isSelected ? 'z-20' : ''}`}
+      onClick={(e) => {
+        // Prevent selecting if we are clicking dragging handle or delete
+        if (!e.defaultPrevented) {
+             onSelect(id);
+        }
+      }}
     >
       {/* Selection/Hover Outline */}
-      <div className="absolute -inset-0.5 rounded-lg border-2 border-transparent group-hover:border-indigo-500/50 pointer-events-none transition-colors" />
+      <div className={`absolute -inset-0.5 rounded-lg border-2 transition-colors pointer-events-none
+        ${isSelected ? 'border-indigo-600 shadow-[0_0_0_4px_rgba(79,70,229,0.1)]' : 'border-transparent group-hover:border-indigo-500/50'}
+      `} />
 
-      {/* Toolbar - appears on hover */}
-      <div className="absolute -top-8 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
+      {/* Toolbar - appears on hover or selection */}
+      <div className={`absolute -top-10 right-0 flex justify-end opacity-0 transition-all duration-200 z-30 pointer-events-none
+        ${(isSelected || isDragging) ? 'opacity-100 pointer-events-auto' : 'group-hover:opacity-100 group-hover:pointer-events-auto'}
+      `}>
          <div className="bg-gray-900 text-white rounded-lg shadow-xl flex items-center overflow-hidden transform translate-y-2 group-hover:translate-y-0 transition-transform">
              <button
                 className="p-1.5 hover:bg-gray-700 cursor-grab active:cursor-grabbing border-r border-gray-700"
@@ -41,7 +51,11 @@ export function SortableItem({ id, component, onDelete }) {
                 <GripVertical size={16} />
              </button>
              <button
-                onClick={() => onDelete(id)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onDelete(id);
+                }}
                 className="p-1.5 hover:bg-red-600 text-gray-300 hover:text-white transition-colors"
                 title="Delete section"
              >
@@ -50,7 +64,7 @@ export function SortableItem({ id, component, onDelete }) {
          </div>
       </div>
 
-      <div className="relative bg-white rounded-lg shadow-sm group-hover:shadow-md transition-shadow overflow-hidden">
+      <div className="relative bg-white rounded-lg shadow-sm group-hover:shadow-md transition-shadow overflow-hidden cursor-pointer">
           {component}
       </div>
     </div>
@@ -61,4 +75,6 @@ SortableItem.propTypes = {
   id: PropTypes.string.isRequired,
   component: PropTypes.node.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onSelect: PropTypes.func,
+  isSelected: PropTypes.bool
 };

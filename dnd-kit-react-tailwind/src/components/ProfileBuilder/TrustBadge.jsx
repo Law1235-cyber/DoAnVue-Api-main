@@ -1,7 +1,12 @@
 import React from 'react';
 import { ShieldCheck, Star, Truck } from 'lucide-react';
 
-export default function TrustBadge() {
+import { COMPONENT_SCHEMAS } from './schemas';
+
+export default function TrustBadge({ content }) {
+  const defaults = COMPONENT_SCHEMAS.trustBadge.fields.reduce((acc, f) => ({...acc, [f.name]: f.default}), {});
+  const data = { ...defaults, ...content };
+
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 shadow-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0">
@@ -11,8 +16,8 @@ export default function TrustBadge() {
                 <ShieldCheck size={24} />
             </div>
             <div>
-                <h3 className="font-bold text-gray-900 text-base md:text-lg">Verified Seller</h3>
-                <p className="text-sm text-gray-600">Identity confirmed</p>
+                <h3 className="font-bold text-gray-900 text-base md:text-lg">{data.badge1Title}</h3>
+                <p className="text-sm text-gray-600">{data.badge1Text}</p>
             </div>
         </div>
 
@@ -23,8 +28,8 @@ export default function TrustBadge() {
                 <Star size={24} fill="currentColor" />
             </div>
             <div>
-                <h3 className="font-bold text-gray-900 text-base md:text-lg">99% Positive</h3>
-                <p className="text-sm text-gray-600">Based on 1.2k reviews</p>
+                <h3 className="font-bold text-gray-900 text-base md:text-lg">{data.badge2Title}</h3>
+                <p className="text-sm text-gray-600">{data.badge2Text}</p>
             </div>
         </div>
 
@@ -35,8 +40,8 @@ export default function TrustBadge() {
                 <Truck size={24} />
             </div>
             <div>
-                <h3 className="font-bold text-gray-900 text-base md:text-lg">Fast Shipper</h3>
-                <p className="text-sm text-gray-600">Ships within 24h</p>
+                <h3 className="font-bold text-gray-900 text-base md:text-lg">{data.badge3Title}</h3>
+                <p className="text-sm text-gray-600">{data.badge3Text}</p>
             </div>
         </div>
 

@@ -1,7 +1,12 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 
-export default function SellerVideo() {
+import { COMPONENT_SCHEMAS } from './schemas';
+
+export default function SellerVideo({ content }) {
+  const defaults = COMPONENT_SCHEMAS.sellerVideo.fields.reduce((acc, f) => ({...acc, [f.name]: f.default}), {});
+  const data = { ...defaults, ...content };
+
   return (
     <div className="bg-black rounded-xl overflow-hidden shadow-md relative aspect-video group cursor-pointer">
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -15,9 +20,9 @@ export default function SellerVideo() {
       </div>
 
       <div className="absolute bottom-0 left-0 p-6 text-white">
-        <h3 className="text-xl font-bold mb-2">Meet the Maker: Studio Tour</h3>
+        <h3 className="text-xl font-bold mb-2">{data.title}</h3>
         <p className="text-white/80 line-clamp-2">
-            Join us behind the scenes to see how we craft our products with care and attention to detail.
+            {data.description}
         </p>
       </div>
     </div>

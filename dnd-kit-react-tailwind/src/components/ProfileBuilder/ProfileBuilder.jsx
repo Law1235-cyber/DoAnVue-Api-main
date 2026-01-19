@@ -13,12 +13,14 @@ import { v4 as uuidv4 } from 'uuid';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
+import PropertiesPanel from './PropertiesPanel';
 import { DraggableSource } from './DraggableSource';
 import HeroProduct from './HeroProduct';
 import TrustBadge from './TrustBadge';
 import CollectionsGrid from './CollectionsGrid';
 import SellerVideo from './SellerVideo';
 import ComponentThumbnail from './ComponentThumbnail';
+import { getDefaultsForType } from './schemas';
 
 // Component Registry
 const COMPONENT_MAP = {
@@ -32,6 +34,7 @@ export default function ProfileBuilder() {
   const [items, setItems] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [activeItem, setActiveItem] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState('desktop');
 
@@ -90,6 +93,7 @@ export default function ProfileBuilder() {
             const newItem = {
                 id: uuidv4(),
                 type: active.data.current.type,
+                content: getDefaultsForType(active.data.current.type)
             };
 
             if (over.id !== 'canvas-droppable') {
@@ -100,6 +104,7 @@ export default function ProfileBuilder() {
             } else {
                 setItems((prev) => [...prev, newItem]);
             }
+            setSelectedItemId(newItem.id);
         }
     }
     else if (active.id !== over.id) {
@@ -113,13 +118,22 @@ export default function ProfileBuilder() {
 
   const handleDelete = (id) => {
       setItems((prev) => prev.filter(i => i.id !== id));
+      if (selectedItemId === id) setSelectedItemId(null);
+  };
+
+  const handleUpdateItem = (id, newContent) => {
+      setItems((prev) => prev.map(item =>
+          item.id === id ? { ...item, content: newContent } : item
+      ));
   };
 
   const renderComponent = (item) => {
     const Component = COMPONENT_MAP[item.type];
     if (!Component) return <div>Unknown Component</div>;
-    return <Component />;
+    return <Component content={item.content} />;
   };
+
+  const selectedItem = items.find(i => i.id === selectedItemId);
 
   return (
     <DndContext
@@ -142,14 +156,28 @@ export default function ProfileBuilder() {
                 onClose={() => setIsSidebarOpen(false)}
             />
 
-            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)]">
+            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide">
                 <Canvas
                     items={items}
                     renderComponent={renderComponent}
                     onDelete={handleDelete}
                     viewMode={viewMode}
+                    onSelect={setSelectedItemId}
+                    selectedItemId={selectedItemId}
                 />
             </main>
+
+            {/* Right Properties Panel */}
+            <div className={`transition-all duration-300 ease-in-out border-l border-gray-200 bg-white shadow-xl lg:shadow-none z-30
+                ${selectedItemId ? 'w-80 translate-x-0' : 'w-0 translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'}
+            `}>
+                <PropertiesPanel
+                    selectedItem={selectedItem}
+                    onUpdateItem={handleUpdateItem}
+                    onDelete={handleDelete}
+                    onClose={() => setSelectedItemId(null)}
+                />
+            </div>
         </div>
       </div>
 
