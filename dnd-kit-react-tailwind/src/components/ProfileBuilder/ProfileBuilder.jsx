@@ -142,7 +142,7 @@ export default function ProfileBuilder() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-gray-50/50">
+      <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-[#f0f0f1]">
         <Header
             onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
             isSidebarOpen={isSidebarOpen}
@@ -156,7 +156,7 @@ export default function ProfileBuilder() {
                 onClose={() => setIsSidebarOpen(false)}
             />
 
-            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide">
+            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide bg-[#f0f0f1]">
                 <Canvas
                     items={items}
                     renderComponent={renderComponent}

@@ -8,7 +8,7 @@ import CollectionsGrid from './CollectionsGrid';
 import SellerVideo from './SellerVideo';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Layout, Type, ShoppingCart, Image as ImageIcon } from 'lucide-react';
 
 // Registry for sidebar thumbnails
 const THUMBNAIL_MAP = {
@@ -16,6 +16,14 @@ const THUMBNAIL_MAP = {
   trustBadge: TrustBadge,
   collectionsGrid: CollectionsGrid,
   sellerVideo: SellerVideo,
+};
+
+// Map categories to icons
+const CATEGORY_ICONS = {
+  commerce: ShoppingCart,
+  media: ImageIcon,
+  layout: Layout,
+  text: Type
 };
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -46,32 +54,36 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Sidebar Container */}
       <div
         className={classNames(
-            "fixed top-16 bottom-0 left-0 w-80 bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 overflow-y-auto scrollbar-thin shadow-xl lg:shadow-none flex flex-col",
+            "fixed top-16 bottom-0 left-0 w-80 bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 overflow-y-auto scrollbar-thin shadow-xl lg:shadow-none flex flex-col font-sans",
             isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="p-6 pb-2">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-1">Components</h2>
-            <p className="text-xs text-gray-500">Drag to build your page.</p>
+        <div className="p-5 border-b border-gray-100 bg-gray-50/50">
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Add Blocks</h2>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
-            <div className="flex flex-col gap-2">
+        <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex flex-col gap-6">
                 {SIDEBAR_CATEGORIES.map((category) => {
                     const isExpanded = expandedCategories.includes(category.id);
+                    // Simple icon mapping fallback
+                    const Icon = CATEGORY_ICONS[category.id] || Layout;
 
                     return (
-                        <div key={category.id} className="border-b border-gray-100 last:border-0 pb-2">
+                        <div key={category.id} className="group">
                             <button
                                 onClick={() => toggleCategory(category.id)}
-                                className="w-full flex items-center justify-between p-2 text-left text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                                className="w-full flex items-center justify-between py-2 mb-2 text-left text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
                             >
-                                <span>{category.label}</span>
-                                {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                                <span className="flex items-center gap-2">
+                                    {/* <Icon size={16} className="text-gray-400 group-hover:text-indigo-500 transition-colors"/> */}
+                                    {category.label}
+                                </span>
+                                {isExpanded ? <ChevronDown size={14} className="text-gray-400" /> : <ChevronRight size={14} className="text-gray-400" />}
                             </button>
 
                             {isExpanded && (
-                                <div className="flex flex-col gap-4 mt-2 px-2 animate-in slide-in-from-top-2 duration-200">
+                                <div className="grid grid-cols-1 gap-4 animate-in fade-in duration-300">
                                     {category.items.map((item) => {
                                         const Component = THUMBNAIL_MAP[item.type];
                                         return (

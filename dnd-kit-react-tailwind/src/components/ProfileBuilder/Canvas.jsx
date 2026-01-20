@@ -10,53 +10,68 @@ export default function Canvas({ items, renderComponent, onDelete, viewMode, onS
     id: 'canvas-droppable',
   });
 
-  const getMaxWidth = () => {
+  const getContainerStyle = () => {
     switch (viewMode) {
-      case 'mobile': return 'max-w-[375px]';
-      case 'tablet': return 'max-w-[768px]';
-      default: return 'max-w-5xl';
+      case 'mobile':
+        return {
+            width: '375px',
+            minHeight: '667px',
+            borderWidth: '1px',
+        };
+      case 'tablet':
+        return {
+            width: '768px',
+            minHeight: '1024px',
+            borderWidth: '1px',
+        };
+      default:
+        return {
+            width: '100%',
+            maxWidth: '1024px',
+            minHeight: '800px',
+            borderWidth: '0px', // Desktop often feels like "full page"
+        };
     }
   };
 
+  const containerStyle = getContainerStyle();
+
   return (
-    <div className="pt-24 pb-32 px-4 md:px-8 lg:ml-80 min-h-full flex flex-col items-center transition-all duration-300">
+    <div className="pt-24 pb-32 px-4 min-h-full flex flex-col items-center justify-start transition-all duration-300 bg-gray-100/50">
 
-      {/* Title section - only show on desktop view mode or if screen is large enough */}
-      <div className="w-full max-w-5xl mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Profile Layout</h1>
-            <p className="text-gray-500 mt-2">Customize how visitors see your store.</p>
-        </div>
-        <div className="bg-white px-4 py-2 rounded-full text-sm font-medium text-gray-600 shadow-sm border border-gray-200 whitespace-nowrap">
-           {items.length} {items.length === 1 ? 'Section' : 'Sections'}
-        </div>
-      </div>
-
-      <div className={`w-full ${getMaxWidth()} transition-all duration-500 ease-in-out`}>
+      {/* Canvas Wrapper */}
+      <div
+        className="transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] flex flex-col items-center"
+        style={{ width: viewMode === 'desktop' ? '100%' : 'auto' }}
+      >
         <div
-          id="canvas-droppable" // Add explicit ID for Playwright
+          id="canvas-droppable"
           ref={setNodeRef}
+          style={{
+              width: containerStyle.width,
+              minHeight: containerStyle.minHeight
+          }}
           className={`
-            min-h-[600px] rounded-xl transition-all duration-300 relative
-            ${items.length === 0 ? 'border-2 border-dashed border-gray-300 bg-white' : 'bg-white shadow-2xl border border-gray-200'}
-            ${isOver
-                ? 'ring-4 ring-indigo-100 border-indigo-500'
-                : ''
-            }
+            relative bg-white shadow-sm transition-all duration-300
+            ${viewMode !== 'desktop' ? 'border-gray-300 shadow-2xl my-8' : 'border-x border-gray-200 shadow-sm'}
+            ${isOver ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}
           `}
         >
           {items.length === 0 ? (
-             <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-4 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-indigo-300 group-hover:text-indigo-500 transition-colors">
-                    <Plus size={32} strokeWidth={3} />
+             <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center select-none">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 text-gray-300 border-2 border-dashed border-gray-200">
+                    <Plus size={40} strokeWidth={2} />
                 </div>
-                <p className="text-lg font-medium text-gray-600">Start Building</p>
-                <p className="text-sm mt-2 max-w-xs text-gray-400">
-                    Drag components from the sidebar to create your page.
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">Start Designing</h3>
+                <p className="text-gray-500 max-w-sm mx-auto">
+                    Drag blocks from the sidebar to build your page layout.
                 </p>
              </div>
           ) : (
-            <div className="p-4 md:p-8 pb-12 min-h-[600px]">
+            <div className={`
+                flex flex-col
+                ${viewMode === 'desktop' ? 'p-8 md:p-12' : 'p-4'}
+            `}>
                 <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
                 {items.map((item) => (
                     <SortableItem
@@ -70,13 +85,23 @@ export default function Canvas({ items, renderComponent, onDelete, viewMode, onS
                 ))}
                 </SortableContext>
 
-                {/* Drop indicator at bottom */}
-                <div className={`h-24 border-2 border-dashed border-gray-200 rounded-lg mt-4 flex items-center justify-center text-gray-400 text-sm transition-all duration-200 ${isOver ? 'bg-indigo-50 border-indigo-300 text-indigo-500' : 'bg-gray-50'}`}>
-                    {isOver ? 'Drop here to add to bottom' : 'Drag more items here'}
+                {/* Drop indicator / Spacer */}
+                <div className={`
+                    mt-4 h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-sm font-medium transition-colors
+                    ${isOver ? 'border-indigo-400 bg-indigo-50 text-indigo-600' : 'border-gray-100 bg-gray-50/50 text-gray-400'}
+                `}>
+                    {isOver ? 'Drop to append' : 'Add more blocks'}
                 </div>
             </div>
           )}
         </div>
+
+        {/* Device Name Label */}
+        {viewMode !== 'desktop' && (
+            <div className="mt-4 text-xs font-medium text-gray-400 uppercase tracking-widest">
+                {viewMode === 'mobile' ? 'iPhone SE' : 'iPad Mini'}
+            </div>
+        )}
       </div>
     </div>
   );
