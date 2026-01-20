@@ -11,10 +11,10 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { v4 as uuidv4 } from 'uuid';
 
 import Header from './Header';
-import Sidebar from './Sidebar';
+import SidebarNav from './SidebarNav';
+import SidebarDrawer from './SidebarDrawer';
 import Canvas from './Canvas';
 import PropertiesPanel from './PropertiesPanel';
-import { DraggableSource } from './DraggableSource';
 import HeroProduct from './HeroProduct';
 import TrustBadge from './TrustBadge';
 import CollectionsGrid from './CollectionsGrid';
@@ -35,7 +35,7 @@ export default function ProfileBuilder() {
   const [activeId, setActiveId] = useState(null);
   const [activeItem, setActiveItem] = useState(null);
   const [selectedItemId, setSelectedItemId] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null); // 'commerce', 'content', etc.
   const [viewMode, setViewMode] = useState('desktop');
 
   const sensors = useSensors(
@@ -50,19 +50,9 @@ export default function ProfileBuilder() {
     const { active } = event;
     setActiveId(active.id);
 
-    // Close sidebar on mobile when drag starts?
-    // Actually, on mobile, if sidebar covers the screen, we need to close it to drop?
-    // If sidebar is a full drawer, we can't drag OUT of it easily unless it doesn't cover everything
-    // or if we have a specific interaction.
-    // For this "Drawer" implementation:
-    // If we drag from sidebar, the sidebar needs to stay open until we move out?
-    // Dnd-kit handles this if the z-index is right.
-    // But if the sidebar covers the canvas (mobile), dropping is impossible unless sidebar closes or is partial.
-    // Let's assume on mobile we might just tap to add, but sticking to DnD:
-    // If sidebar is overlay, user drags item, we should probably auto-close sidebar or make it transparent?
-    // Let's try auto-closing if screen is small.
+    // Auto-close sidebar on mobile/tablet when dragging starts
     if (window.innerWidth < 1024) {
-       setIsSidebarOpen(false);
+       setActiveCategory(null);
     }
 
     if (active.data.current?.source === 'sidebar') {
@@ -144,19 +134,25 @@ export default function ProfileBuilder() {
     >
       <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-[#f0f0f1]">
         <Header
-            onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-            isSidebarOpen={isSidebarOpen}
+            onToggleSidebar={() => {}} // No longer needed
+            isSidebarOpen={!!activeCategory} // No longer needed
             viewMode={viewMode}
             setViewMode={setViewMode}
         />
 
         <div className="flex flex-1 relative overflow-hidden">
-            <Sidebar
-                isOpen={isSidebarOpen}
-                onClose={() => setIsSidebarOpen(false)}
+            {/* New Sidebar Structure */}
+            <SidebarNav
+                activeCategory={activeCategory}
+                onSelect={setActiveCategory}
             />
 
-            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide bg-[#f0f0f1]">
+            <SidebarDrawer
+                activeCategory={activeCategory}
+                onClose={() => setActiveCategory(null)}
+            />
+
+            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide bg-[#f0f0f1] lg:ml-20 pb-16 lg:pb-0">
                 <Canvas
                     items={items}
                     renderComponent={renderComponent}
@@ -170,6 +166,7 @@ export default function ProfileBuilder() {
             {/* Right Properties Panel */}
             <div className={`transition-all duration-300 ease-in-out border-l border-gray-200 bg-white shadow-xl lg:shadow-none z-30
                 ${selectedItemId ? 'w-80 translate-x-0' : 'w-0 translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'}
+                fixed inset-y-0 right-0 lg:relative
             `}>
                 <PropertiesPanel
                     selectedItem={selectedItem}
