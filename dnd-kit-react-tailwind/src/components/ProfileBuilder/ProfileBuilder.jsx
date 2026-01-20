@@ -120,7 +120,8 @@ export default function ProfileBuilder() {
   const renderComponent = (item) => {
     const Component = COMPONENT_MAP[item.type];
     if (!Component) return <div>Unknown Component</div>;
-    return <Component content={item.content} />;
+    // Pass viewMode explicitly for responsive rendering
+    return <Component content={item.content} viewMode={viewMode} />;
   };
 
   const selectedItem = items.find(i => i.id === selectedItemId);
@@ -152,7 +153,8 @@ export default function ProfileBuilder() {
                 onClose={() => setActiveCategory(null)}
             />
 
-            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide bg-[#f0f0f1] lg:ml-20 pb-16 lg:pb-0">
+            {/* Note: changed lg:ml-20 to md:ml-20 to support Tablet Left Sidebar */}
+            <main className="flex-1 w-full relative overflow-y-auto h-[calc(100vh-64px)] scrollbar-hide bg-[#f0f0f1] md:ml-20 pb-20 md:pb-0">
                 <Canvas
                     items={items}
                     renderComponent={renderComponent}

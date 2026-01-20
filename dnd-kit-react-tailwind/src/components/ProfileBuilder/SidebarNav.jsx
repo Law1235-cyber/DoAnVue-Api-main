@@ -13,11 +13,27 @@ const CATEGORY_ICONS = {
 export default function SidebarNav({ activeCategory, onSelect }) {
   return (
     <div className={classNames(
-      "fixed z-50 bg-gray-900 border-gray-800 flex shadow-xl", // Changed to dark theme for "Canva-like" Pro look
-      // Desktop: Vertical left column
-      "lg:left-0 lg:top-16 lg:bottom-0 lg:w-20 lg:flex-col lg:border-r",
-      // Mobile: Horizontal bottom bar
-      "bottom-0 left-0 w-full h-20 flex-row border-t justify-around items-center lg:justify-start lg:pt-4 lg:gap-6"
+      "fixed z-50 bg-gray-900 border-gray-800 flex shadow-xl",
+      // Changed breakpoints from lg to md to support Tablet Left Sidebar
+      "md:left-0 md:top-16 md:bottom-0 md:w-20 md:flex-col md:border-r",
+      // Mobile only (below md)
+      // FIX: Tailwind 'md:hidden' hides the element on md+ screens.
+      // But here we are applying classes to the SAME div.
+      // We want the div to be flex-row on mobile, flex-col on md.
+      // We need to be careful with conflicting display properties.
+      // 'flex' is applied first.
+      // 'md:flex-col' overrides flex direction.
+      // 'flex-row' is default.
+      // 'bottom-0 left-0 w-full h-20 justify-around items-center' -> Mobile styles.
+      // 'md:justify-start md:pt-4 md:gap-6' -> Desktop overrides.
+
+      // Let's rewrite strictly:
+      "flex justify-around items-center", // Default mobile layout (flex-row implied or explicit)
+      "bottom-0 left-0 w-full h-20 border-t", // Mobile positioning
+
+      // Desktop/Tablet Overrides:
+      "md:flex-col md:justify-start md:items-center md:pt-4 md:gap-6", // Layout changes
+      "md:left-0 md:top-16 md:bottom-0 md:w-20 md:h-auto md:border-r md:border-t-0" // Positioning changes
     )}>
       {SIDEBAR_CATEGORIES.map((cat) => {
         const Icon = CATEGORY_ICONS[cat.id] || Layout;
@@ -29,18 +45,20 @@ export default function SidebarNav({ activeCategory, onSelect }) {
             onClick={() => onSelect(isActive ? null : cat.id)}
             className={classNames(
               "flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 group relative",
-              "lg:w-16 lg:h-16 lg:mx-auto",
-              "flex-1 h-full pb-safe", // Handle safe area on mobile
+              "md:w-16 md:h-16 md:mx-auto", // Desktop/Tablet square
+              "flex-1 h-full pb-safe", // Mobile
               isActive
                 ? "text-white bg-gray-800 shadow-inner"
                 : "text-gray-400 hover:text-white hover:bg-gray-800/50"
             )}
           >
-            {/* Active Indicator Line (Left on Desktop, Top on Mobile) */}
+            {/* Active Indicator Line */}
             {isActive && (
                 <>
-                    <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-indigo-500 rounded-r-full" />
-                    <div className="lg:hidden absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-indigo-500 rounded-b-full" />
+                    {/* Left indicator for Desktop/Tablet */}
+                    <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-indigo-500 rounded-r-full" />
+                    {/* Top indicator for Mobile */}
+                    <div className="md:hidden absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-indigo-500 rounded-b-full" />
                 </>
             )}
 
